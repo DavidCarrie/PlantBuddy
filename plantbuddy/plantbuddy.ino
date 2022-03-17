@@ -3,7 +3,8 @@
 #include "light_control.h"
 #include "user_input.h"
 #include "water_control.h"
-
+ 
+ 
 int OWater1 = 2;
 int OLight1 = 3;
 
@@ -17,6 +18,7 @@ float water1 = 0;
 float light1 = 0;
 void setup() {
   Serial.begin(9600);
+  while (!Serial) {}/*wait for serial*/
   pinMode(OWater1, OUTPUT);
   pinMode(Pin1, INPUT);
   pinMode(OLight1, OUTPUT);
@@ -30,6 +32,7 @@ void loop() {
   Serial.print("MOISTURE LEVEL: ");
   water1 = analogRead(Pin1);
   Serial.println(water1);
+ 
   if(water1>500)
   {
       digitalWrite(OWater1, HIGH);
