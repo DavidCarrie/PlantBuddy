@@ -3,7 +3,7 @@
 #include "light_control.h"
 #include "user_input.h"
 #include "water_control.h"
- 
+#include "timer.h"
  
 int OWater1 = 2;
 int OLight1 = 3;
@@ -20,6 +20,7 @@ float light1 = 0;
 float waterThreshold=500;
 float lightThreshold=550;
 
+
 void setup() {
   Serial.begin(9600);
   while (!Serial) {}/*wait for serial*/
@@ -30,8 +31,13 @@ void setup() {
   
   digitalWrite(OWater1, HIGH);
   digitalWrite(OLight1, HIGH);
+//Temp time setup we mentioned user input real time but its just for syncing purpose and not a service provided so it feels fine by me to just set time in code 
+  setTime(0,22,30,19);//SetTime(day, hour, minute,Clockspeed_multiplier)
   delay(500);
-}
+
+
+
+ }
 void loop() {
  delay(1000);
 /*BEGIN WIP modules*/
@@ -69,7 +75,18 @@ userInputInLoopCheck();
 
 /*DEBUG:SHOW ALL VAR*/
 Serial.print("light threshold: ");
-Serial.println(lightThreshold);Serial.print("water threshold: ");
+Serial.println(lightThreshold);
+Serial.print("water threshold: ");
 Serial.println(waterThreshold);
+
+// timer.h provides get functions e.g. day()   second()   hour()  minute()
+Serial.print("day ");
+Serial.print(day());
+Serial.print("   hour ");
+Serial.print(hour());
+Serial.print("   minute ");
+Serial.print(minute());
+Serial.print("   second ");
+Serial.print(second());
 
 }
