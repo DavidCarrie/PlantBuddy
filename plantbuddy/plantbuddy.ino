@@ -26,8 +26,13 @@ float lightThreshold=550;
 //Start water variable overwrite
 
 // Water variables
-////int OWater1 = 3;//????????????????????????????????????We dont know why T switched pin 2 3 ; water light input pin
+////int OWater1 = 3;//?????????We dont know why T switched pin 2 3 ; water light input pin
 //@TODO 1 Water: why pin switch  2: How do we know it works, prev watered 
+
+// Light variables
+//int OLight1 = 2; // ??? 
+ 
+int light = 0; //represents light status: 0 -> off, 1 -> on
 
 
 unsigned long previousWateredTime = 0;
@@ -52,13 +57,19 @@ void setup() {
   digitalWrite(OWater1, HIGH);
   digitalWrite(OLight1, HIGH);
 //Temp time setup we mentioned user input real time but its just for syncing purpose and not a service provided so it feels fine by me to just set time in code 
-  setTime(0,22,30,19);//SetTime(day, hour, minute,Clockspeed_multiplier)
-  delay(500);
+  setTime(0,22,30,1);//SetTime(day, hour, minute,Clockspeed_multiplier)
+
+//NEw setup
+  setupWaterModule();
+
+  setupLightModule();
+
+   delay(500); 
 
 /* Test WriteLog and ReadLog. The data should be kept even when we reset.
 writeLog(3,0,8,30,57);
-writeLog(2,0,8,35,58);*/
-writeLog(6,3,10,30,01);
+writeLog(2,0,8,35,58);
+writeLog(6,3,10,30,01);*/
 
 readLog();
  }
@@ -67,6 +78,10 @@ void loop() {
 /*BEGIN WIP modules*/
 userInputPrintGuide();
 userInputInLoopCheck();
+
+waterModule();
+  lightModule(hour(),day(), minute());
+
 /*END WIP modules*/
 
 
@@ -114,8 +129,7 @@ Serial.print("   second ");
 Serial.print(second());
 
 //
-displayWaterVariables();
-adjustWaterInterval(1);
+//displayWaterVariables(); 
 
 }//END of LOOP
 
@@ -224,3 +238,59 @@ void displayWaterVariables() {
 //----------------------------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------------------------
 //End of water Function Definition
+//Begin Light function Def
+
+void setupLightModule(){
+  pinMode(OLight1, OUTPUT);
+  pinMode(Pin2, INPUT);
+  digitalWrite(OLight1, HIGH);
+}
+
+void lightModule(int currentHour, int currentDay, int currentMinute){
+  //light sensoring
+  Serial.print("Light Level: ");
+  light1 = analogRead(Pin2);
+  Serial.println(light1);
+  Serial.println();
+  
+  //assume daytime is in range of [7, 19]
+  if (currentHour >= 7 && currentHour < 19 && light1 < lightThreshold && light == 0){
+      light_on(currentHour, currentDay, currentMinute);
+  }
+  /*else if (currentHour >= 7 && currentHour < 19 && light1 >= lightThreshold && light == 1){
+      light_off(currentHour, currentDay, currentMinute);
+  }*/
+  //assume nighttime is in range of [19, 24) & [0, 7)
+  else if (currentHour >= 0 && currentHour < 7 && light == 1){
+      light_off(currentHour, currentDay, currentMinute);
+  }
+  else if (currentHour >= 19 && currentHour < 24 && light == 1){
+      light_off(currentHour, currentDay, currentMinute);
+  }
+}
+
+void light_on(int currentHour, int currentDay, int currentMinute){
+  digitalWrite(OLight1, HIGH);
+  light = 1;
+  Serial.print("light turn up at day ");
+  Serial.print(currentDay);
+  Serial.print("   hour ");
+  Serial.print(currentHour);
+  Serial.print("   minute ");
+  Serial.print(currentMinute);
+  Serial.println();
+}
+
+void light_off(int currentHour, int currentDay, int currentMinute){
+  light = 0;
+  digitalWrite(OLight1, LOW);
+  Serial.print("light turn off at day ");
+  Serial.print(currentDay);
+  Serial.print("   hour ");
+  Serial.print(currentHour);
+  Serial.print("   minute ");
+  Serial.print(currentMinute);
+  Serial.println();
+}
+
+//End light func def;
