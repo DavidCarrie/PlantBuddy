@@ -1,5 +1,5 @@
 unsigned long realTimeOffset;//in miliseconds, will add to milis()
-unsigned long militime;
+extern unsigned long militime;
 unsigned long clockSpeedMultiplier = 1;//Faster clock time for dev/demo purpose
 
 void setTime(unsigned long day, unsigned long hour, unsigned long minute,unsigned long csm)

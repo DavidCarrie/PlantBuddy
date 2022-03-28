@@ -40,6 +40,7 @@ void writeLog(byte event, byte day, byte hour, byte minute, byte second)
 void readLog()
 {
       Serial.println("\nLogs\n");
+      Serial.println("Event:1 Water   2 Light on   3 Light off      4WaterErr    5LightErr 6Threshold change  7 Frequency inc 8 Freq dec \n");
   while(EEPROM.read(readaddr)!=255)
   {
     EEPROM.get(readaddr,logread);
