@@ -25,12 +25,12 @@ void setup() {
   Serial.begin(9600);
   while (!Serial) {}/*wait for serial*/
   pinMode(OWater1, OUTPUT);
-  pinMode(Pin1, INPUT);
-  pinMode(OLight1, OUTPUT);
-  pinMode(Pin2, INPUT);
-  
+  pinMode(Pin1, INPUT);  
   digitalWrite(OWater1, HIGH);
-  digitalWrite(OLight1, HIGH);
+ 
+ //Setup light module
+  setupLightModule();
+
 //Temp time setup we mentioned user input real time but its just for syncing purpose and not a service provided so it feels fine by me to just set time in code 
   setTime(0,22,30,19);//SetTime(day, hour, minute,Clockspeed_multiplier)
   delay(500);
@@ -60,18 +60,11 @@ userInputInLoopCheck();
     digitalWrite(OWater1, LOW);
   }
     
+  currentHour = hour();
+  currentDay = day();
+  currentMinute = minute();
+  lightModule(currentHour, currentDay, currentMinute);
 
-   //Light Sensing
-  Serial.print("Light Level: ");
-  light1 = analogRead(Pin2);
-  Serial.println(light1);
-  Serial.println(); 
-
-  if (light1 < lightThreshold){
-    digitalWrite(OLight1, HIGH);
-  }else{
-    digitalWrite(OLight1, LOW);
-  }
 
 /*DEBUG:SHOW ALL VAR*/
 Serial.print("light threshold: ");
