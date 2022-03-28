@@ -35,8 +35,12 @@ void setup() {
   setTime(0,22,30,19);//SetTime(day, hour, minute,Clockspeed_multiplier)
   delay(500);
 
+/* Test WriteLog and ReadLog. The data should be kept even when we reset.
+writeLog(3,0,8,30,57);
+writeLog(2,0,8,35,58);*/
+writeLog(6,3,10,30,01);
 
-
+readLog();
  }
 void loop() {
  delay(1000);
