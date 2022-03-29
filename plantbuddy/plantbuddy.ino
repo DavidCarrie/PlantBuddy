@@ -4,6 +4,8 @@
 #include "user_input.h"
 #include "water_control.h"
 #include "timer.h"
+
+// START VARIABLES SECTION
 unsigned long militime;
  
 int OWater1 = 2;
@@ -15,36 +17,23 @@ int Pin1 = A0;
 //Pin 2 For light Sensor
 int Pin2 = A1;
 
-float water1 = 0;//moisture lvl
 float light1 = 0;
-
-float waterThreshold=500;
 float lightThreshold=550;
-/*ORiginal var*/
-
-
-//Start water variable overwrite
-
-// Water variables
-////int OWater1 = 3;//?????????We dont know why T switched pin 2 3 ; water light input pin
-//@TODO 1 Water: why pin switch  2: How do we know it works, prev watered 
-
-// Light variables
-//int OLight1 = 2; // ??? 
  
 int light = 0; //represents light status: 0 -> off, 1 -> on
 
-
+float water1 = 0; // Moisture level
+int waterThreshold=600; // Configurable by user
+int waterThresholdRange=300; // the range +/- the waterThreshold that is okay. Configurable by user
+int minWaterThreshold = waterThreshold - waterThresholdRange;
+int maxWaterThreshold = waterThreshold + waterThresholdRange;
 unsigned long previousWateredTime = 0;
-float relativeWateredTime = 0; // Time since last watered, in minutes for now
-float waterThresholdRange=100; // the range +/- the waterThreshold that is okay. Configurable by user
-float minWaterThreshold = waterThreshold - waterThresholdRange;
-float maxWaterThreshold = waterThreshold + waterThresholdRange;
-float waterInterval = 8; // Configurable by user + the system automatically, in minutes for now
-float minWaterInterval = 4; // Configurable by user, in minutes for now
-float maxWaterInterval = 12; // Configurable by user, in minutes for now
+int relativeWateredTime = 0; // Time since last watered, in minutes for now
+int waterPumpTime = 5000; // How long to water the plant when in watering mode
+int waterSchedule = 12; // Configurable by user, in minutes for now
+int waterScheduleRange = 2; // Configurable by user, in minutes for now
 
-//end water var overwrite
+// END VARIABLES SECTION
 
 void setup() {
   Serial.begin(9600);
@@ -58,7 +47,7 @@ void setup() {
   digitalWrite(OLight1, HIGH);
 //Temp time setup we mentioned user input real time but its just for syncing purpose and not a service provided so it feels fine by me to just set time in code 
   setTime(0,22,30,1);//SetTime(day, hour, minute,Clockspeed_multiplier)
-
+  Serial.println("\nThe time is: " + String(day()) + ":" + String(hour()) + ":" + String(minute()) + ":" + String(second()));
 //NEw setup
   setupWaterModule();
 
@@ -71,65 +60,71 @@ writeLog(3,0,8,30,57);
 writeLog(2,0,8,35,58);
 writeLog(6,3,10,30,01);*/
 
-readLog();
+//readLog();
  }
 void loop() {
- delay(1000);
-/*BEGIN WIP modules*/
-userInputPrintGuide();
-userInputInLoopCheck();
-
-waterModule();
-  lightModule(hour(),day(), minute());
-
-/*END WIP modules*/
-
-
-/*BEGIN original raw material from David  */
-  Serial.print("MOISTURE LEVEL: ");
-  water1 = analogRead(Pin1);
-  Serial.println(water1);
- 
-  if(water1>waterThreshold)
-  {
-      digitalWrite(OWater1, HIGH);
-  }
-  else
-  {
-    digitalWrite(OWater1, LOW);
-  }
+    delay(1000);
+    /*BEGIN WIP modules*/
+    userInputPrintGuide();
+    userInputInLoopCheck();
     
+    Serial.println("\nThe time is: " + String(day()) + ":" + String(hour()) + ":" + String(minute()) + ":" + String(second()));
+    waterModule();
+    lightModule(hour(),day(), minute());
 
-   //Light Sensing
-  Serial.print("Light Level: ");
-  light1 = analogRead(Pin2);
-  Serial.println(light1);
-  Serial.println(); 
+    /*END WIP modules*/
 
-  if (light1 < lightThreshold){
-    digitalWrite(OLight1, HIGH);
-  }else{
-    digitalWrite(OLight1, LOW);
-  }
 
-/*DEBUG:SHOW ALL VAR*/
-Serial.print("light threshold: ");
-Serial.println(lightThreshold);
-Serial.print("water threshold: ");
-Serial.println(waterThreshold);
+    /*BEGIN original raw material from David  
 
-// timer.h provides get functions e.g. day()   second()   hour()  minute()
-Serial.print("day ");
-Serial.print(day());
-Serial.print("   hour ");
-Serial.print(hour());
-Serial.print("   minute ");
-Serial.print(minute());
-Serial.print("   second ");
-Serial.print(second());
+    Serial.print("MOISTURE LEVEL: ");
+    water1 = analogRead(Pin1);
+    Serial.println(water1);
+    
+    if(water1>waterThreshold)
+    {
+        digitalWrite(OWater1, HIGH);
+    }
+    else
+    {
+        digitalWrite(OWater1, LOW);
+    }
+        
 
-//
-//displayWaterVariables(); 
+    //Light Sensing
+    Serial.print("Light Level: ");
+    light1 = analogRead(Pin2);
+    Serial.println(light1);
+    Serial.println(); 
+
+    if (light1 < lightThreshold){
+        digitalWrite(OLight1, HIGH);
+    }else{
+        digitalWrite(OLight1, LOW);
+    }
+
+    */
+
+    /*DEBUG:SHOW ALL VAR*/
+    Serial.println("------------------- PRINTING ALL VARIABLES -------------------");
+    Serial.print("light threshold: ");
+    Serial.println(lightThreshold);
+    Serial.print("water threshold: ");
+    Serial.println(waterThreshold);
+
+    // timer.h provides get functions e.g. day()   second()   hour()  minute()
+    Serial.print("day ");
+    Serial.print(day());
+    Serial.print("   hour ");
+    Serial.print(hour());
+    Serial.print("   minute ");
+    Serial.print(minute());
+    Serial.print("   second ");
+    Serial.println(second());
+
+    //
+    displayWaterVariables(); 
+    Serial.println("--------------------------------------------------------------");
 
 }//END of LOOP
 
@@ -149,74 +144,53 @@ void setupWaterModule() {
 
 //The main functionality for the water module. Called in the loop function in plantbuddy.ino
 void waterModule() {
-
-  Serial.println("minWaterThreshold: " + String(minWaterThreshold) + ", maxWaterThreshold: " + String(maxWaterThreshold) + ", waterInterval: " + String(waterInterval));
   //Water Sensing
-  Serial.print("Moisture Level: ");
   water1 = analogRead(Pin1);
+  relativeWateredTime = (militime/(unsigned long)60000)-previousWateredTime;
+  
+  Serial.print("Moisture Level: ");
   Serial.println(water1);
-
-   relativeWateredTime = (militime/(unsigned long)60000)-previousWateredTime;
-   Serial.print("militime = "); Serial.println(militime/(unsigned long)60000);
-   Serial.print("previousWateredTime = "); Serial.println(previousWateredTime);
-   Serial.print("relativeWateredTime = "); Serial.println(relativeWateredTime);
-   Serial.println("The last time the plant was watered was: " + String(relativeWateredTime) + " minutes ago. ");
-
-  if(water1 < minWaterThreshold && relativeWateredTime >= waterInterval)
-  {
-      Serial.print("  Setting water level...");
-      digitalWrite(OWater1, HIGH);
-      Serial.println("Set Water level to HIGH.");
-      previousWateredTime = militime/(unsigned long)60000;
-  }
-  else if(water1 < minWaterThreshold && relativeWateredTime < waterInterval)
-  {
-      Serial.print("  Adjusting water interval for next time... ");
-      adjustWaterInterval(0);
-      Serial.print("  Setting water level..."); digitalWrite(OWater1, HIGH);
-      Serial.println("Set Water level to HIGH.");
-      previousWateredTime = militime/(unsigned long)60000;
-  }  
-  else if(water1 > maxWaterThreshold && relativeWateredTime > waterInterval)
-  {
-      Serial.println("Water moisture is still moist...");
-    adjustWaterInterval(1);
-      Serial.print("  Setting water level..."); digitalWrite(OWater1, LOW); Serial.println("Set Water level to LOW.");
-      previousWateredTime = militime/(unsigned long)60000;
-  }   
-  else
-  {
-      Serial.print("  Setting water level..."); digitalWrite(OWater1, LOW); Serial.println("Set Water level to LOW.");
-  }
-
-}
-
-// System automatically configures water interval variable based on environment. Called by the waterModule().
-void adjustWaterInterval(int status) {
-  if (status == 1) {
-    if (waterInterval >= maxWaterInterval) {
-      Serial.println("Please check the system/water-levels. The plant was last watered " + String(relativeWateredTime) + " minutes ago, yet the environment is still moist.");
-        exit(0);
+  Serial.print("militime = "); Serial.println(militime/(unsigned long)60000);
+  Serial.print("previousWateredTime = "); Serial.println(previousWateredTime);
+  Serial.print("relativeWateredTime = "); Serial.println(relativeWateredTime);
+  Serial.println("The last time the plant was watered was: " + String(relativeWateredTime) + " minutes ago. ");
+  
+  Serial.println("Checking if the plant needs to be watered... ");
+  
+  // If the water level goes below the minimum threshold.
+  if(water1 < minWaterThreshold) {
+    // Increase water pumping time if the last time watered was too recent.
+    if (relativeWateredTime < (waterSchedule-waterScheduleRange)) {
+    	waterPumpTime = waterPumpTime + 1;	  	
     }
-    else {
-      waterInterval = waterInterval + 1;
-        Serial.print("Water interval is now: "); Serial.println(waterInterval);  
+    // Decrease water pumping time if the last time watered was too long ago.
+    else if (relativeWateredTime > (waterSchedule+waterScheduleRange)) {
+    	waterPumpTime = waterPumpTime - 1;	
     }
+    // Water the plant
+    Serial.println("  Watering the plant...");
+    digitalWrite(OWater1, HIGH);
+    delay(waterPumpTime);
+    digitalWrite(OWater1, LOW);
+    Serial.println("  Plant has been watered now.\n");
+    Serial.println("\nThe time is: " + String(day()) + ":" + String(hour()) + ":" + String(minute()) + ":" + String(second()));
+    previousWateredTime = militime/(unsigned long)60000;
+    Serial.println("Previous watered time: " + previousWateredTime);
   }
-  else if (status == 0) {
-    if (waterInterval <= minWaterInterval) {
-      Serial.println("Please check the system/water-levels. The plant was last watered " + String(relativeWateredTime) + " minutes ago, yet the environment is already dry.");
-      exit(0);
-    }
-    else {
-      waterInterval = waterInterval - 1;
-      Serial.print("Water interval is now: "); Serial.println(waterInterval);  
-    }  
+  // Do nothing if the water level is between the min and max thresholds
+  else if (water1 >= minWaterThreshold && water1 <= maxWaterThreshold) {
+  	Serial.println("  Watering not needed currently.");
   }
+  // Inform user to check the system if there is too much water in the environment.
+  else if (water1 > maxWaterThreshold) {
+    digitalWrite(OWater1, LOW); // Ensure the system is set to no-watering mode.
+    Serial.println("  Please check the system, there is too much water in the environment.");
+    // exit(0) and print error log
+  }
+  
 }
 
 void displayWaterVariables() {
-
   Serial.println("OWater1: " + String(OWater1));
   Serial.println("Pin1: " + String(Pin1));
   Serial.println("water1: " + String(water1));
@@ -226,10 +200,9 @@ void displayWaterVariables() {
   Serial.println("waterThresholdRange: " + String(waterThresholdRange));
   Serial.println("minWaterThreshold: " + String(minWaterThreshold));
   Serial.println("maxWaterThreshold: " + String(maxWaterThreshold));
-  Serial.println("waterInterval: " + String(waterInterval));
-  Serial.println("minWaterInterval: " + String(minWaterInterval));
-  Serial.println("maxWaterInterval: " + String(maxWaterInterval));
-
+  Serial.println("waterSchedule: " + String(waterSchedule));
+  Serial.println("waterScheduleRange: " + String(waterScheduleRange));
+  Serial.println("waterPumpTime: " + String(waterPumpTime));
 }
 
 
