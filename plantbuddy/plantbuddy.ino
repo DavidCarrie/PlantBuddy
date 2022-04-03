@@ -34,8 +34,9 @@ int maxWaterThreshold = waterThreshold + waterThresholdRange;
 unsigned long previousWateredTime = 0;
 int relativeWateredTime = 0; // Time since last watered, in minutes for now
 int waterPumpTime = 5000; // How long to water the plant when in watering mode
-int waterSchedule = 12; // Configurable by user, in minutes for now
-int waterScheduleRange = 2; // Configurable by user, in minutes for now
+int waterReactTime = 10000;//delay : water takes time to inc moisture level
+int waterSchedule = 12; // Configurable by user, in hours for now
+int waterScheduleRange = 2; // Configurable by user, in hrs for now
 
 // END VARIABLES SECTION
 
@@ -165,17 +166,20 @@ void waterModule() {
   if(water1 < minWaterThreshold) {
     // Increase water pumping time if the last time watered was too recent.
     if (relativeWateredTime < (waterSchedule-waterScheduleRange)) {
-    	waterPumpTime = waterPumpTime + 1;	  	
+    	waterPumpTime = waterPumpTime + 500;	  	
     }
     // Decrease water pumping time if the last time watered was too long ago.
     else if (relativeWateredTime > (waterSchedule+waterScheduleRange)) {
-    	waterPumpTime = waterPumpTime - 1;	
+    	waterPumpTime = waterPumpTime - 500;	
     }
     // Water the plant
     Serial.println("  Watering the plant...");
     digitalWrite(OWater1, HIGH);
     delay(waterPumpTime);
     digitalWrite(OWater1, LOW);
+    //@Todo log instead of print
+    delay(waterReactTime);//delay : water takes time to inc moisture level
+
     Serial.println("  Plant has been watered now.\n");
     Serial.println("\nThe time is: " + String(day()) + ":" + String(hour()) + ":" + String(minute()) + ":" + String(second()));
     previousWateredTime = militime/(unsigned long)60000;
@@ -249,6 +253,8 @@ void lightModule(int currentHour, int currentDay, int currentMinute){
 void light_on(int currentHour, int currentDay, int currentMinute){
   digitalWrite(OLight1, HIGH);
   light = 1;
+      //@Todo log instead of print
+
   Serial.print("light turn up at day ");
   Serial.print(currentDay);
   Serial.print("   hour ");
