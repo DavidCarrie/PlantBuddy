@@ -8,6 +8,7 @@
 //START DEBUG VAR
 bool useLog =false;//in relative section, set if(useLog && *log condition*) {  *logging the event* }
 bool testLight=true;//will bypass condition (if *light condition* || testLight) {light event}
+bool waterExtraDebug=true;//extra water info
 
 // START VARIABLES SECTION
 unsigned long militime;
@@ -164,12 +165,16 @@ void waterModule() {
   
   // If the water level goes below the minimum threshold.
   if(water1 < minWaterThreshold) {
+        if(waterExtraDebug){Serial.println("water reading < min water threshold");}
     // Increase water pumping time if the last time watered was too recent.
     if (relativeWateredTime < (waterSchedule-waterScheduleRange)) {
+        if(waterExtraDebug){Serial.println("Time since last watered too short, add pump time");}  
     	waterPumpTime = waterPumpTime + 500;	  	
     }
     // Decrease water pumping time if the last time watered was too long ago.
     else if (relativeWateredTime > (waterSchedule+waterScheduleRange)) {
+              if(waterExtraDebug){Serial.println("Time since last watered too long, subtract pump time");}  
+
     	waterPumpTime = waterPumpTime - 500;	
     }
     // Water the plant
@@ -187,12 +192,14 @@ void waterModule() {
   }
   // Do nothing if the water level is between the min and max thresholds
   else if (water1 >= minWaterThreshold && water1 <= maxWaterThreshold) {
+            if(waterExtraDebug){Serial.print("min<water<max");}  
+
   	Serial.println("  Watering not needed currently.");
   }
   // Inform user to check the system if there is too much water in the environment.
   else if (water1 > maxWaterThreshold) {
     digitalWrite(OWater1, LOW); // Ensure the system is set to no-watering mode.
-    Serial.println("  Please check the system, there is too much water in the environment.");
+    Serial.println("  Water>maxWaterThreshold Please check the system, there is too much water in the environment.");
     // exit(0) and print error log
   }
   
