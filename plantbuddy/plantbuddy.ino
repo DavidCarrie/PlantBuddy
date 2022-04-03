@@ -5,6 +5,10 @@
 #include "water_control.h"
 #include "timer.h"
 
+//START DEBUG VAR
+bool useLog =false;//in relative section, set if(useLog && *log condition*) {  *logging the event* }
+bool testLight=true;//will bypass condition (if *light condition* || testLight) {light event}
+
 // START VARIABLES SECTION
 unsigned long militime;
  
@@ -46,7 +50,7 @@ void setup() {
   digitalWrite(OWater1, HIGH);
   digitalWrite(OLight1, HIGH);
 //Temp time setup we mentioned user input real time but its just for syncing purpose and not a service provided so it feels fine by me to just set time in code 
-  setTime(0,22,30,1);//SetTime(day, hour, minute,Clockspeed_multiplier)
+  setTime(0,8,30,1);//SetTime(day, hour, minute,Clockspeed_multiplier)
   Serial.println("\nThe time is: " + String(day()) + ":" + String(hour()) + ":" + String(minute()) + ":" + String(second()));
 //NEw setup
   setupWaterModule();
@@ -97,7 +101,7 @@ void loop() {
     Serial.println(light1);
     Serial.println(); 
 
-    if (light1 < lightThreshold){
+    if (light1 < light){
         digitalWrite(OLight1, HIGH);
     }else{
         digitalWrite(OLight1, LOW);
@@ -227,7 +231,7 @@ void lightModule(int currentHour, int currentDay, int currentMinute){
   Serial.println();
   
   //assume daytime is in range of [7, 19]
-  if (currentHour >= 7 && currentHour < 19 && light1 < lightThreshold && light == 0){
+  if (currentHour >= 7 && currentHour < 19 && (light1 < lightThreshold || testLight) && light == 0){
       light_on(currentHour, currentDay, currentMinute);
   }
   /*else if (currentHour >= 7 && currentHour < 19 && light1 >= lightThreshold && light == 1){

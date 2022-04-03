@@ -1,4 +1,4 @@
-extern float waterThreshold;
+extern int waterThreshold;
 extern float lightThreshold;
 
 void userInputPrintGuide()
