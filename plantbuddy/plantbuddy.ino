@@ -12,6 +12,7 @@ bool waterExtraDebug=true;//extra water info
 bool debugCommandLight=false;
 bool debugCommandWater=false;
 bool debugOverwriteMode=false;
+bool onezero=false;
 int loopdelay=2;//seconds of loop sleep time
 // START VARIABLES SECTION
 unsigned long militime;
@@ -74,6 +75,7 @@ writeLog(6,3,10,30,01);*/
 //readLog();
  }
 void loop() {
+  onezero=!onezero;
     delay(loopdelay*1000);
     /*BEGIN WIP modules*/
     userInputPrintGuide();
@@ -132,9 +134,8 @@ void loop() {
     Serial.print("   second ");
     Serial.println(second());
 
-    //
-    displayWaterVariables(); 
-    displayLightVariables();
+    if(onezero){displayWaterVariables();} 
+    else {displayLightVariables();}
     
     /*DEBUG Command On Off */
     if(debugCommandWater){  digitalWrite(OWater1, HIGH);}
@@ -144,7 +145,7 @@ void loop() {
     else{digitalWrite(OLight1, LOW);}
     Serial.println("--------------------------------------------------------------");
 
-}//END of LOOP
+}//END of LOOP//END of LOOP//END of LOOP//END of LOOP
 
 /*BEGIN Water Function DEF*/
 //----------------------------------------------------------------------------------------------------------------

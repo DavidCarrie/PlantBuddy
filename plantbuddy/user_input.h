@@ -1,9 +1,12 @@
 extern int waterThreshold;
+extern int waterPumpTime;
 extern float lightThreshold;
 extern bool debugCommandLight;
 extern bool debugCommandWater;
 extern bool debugOverwriteMode;
 extern int loopdelay;
+
+
 void userInputPrintGuide()
 {
       Serial.println("\n\n-----------\nCommands guideline:");
@@ -90,6 +93,15 @@ String command = Serial.readStringUntil('\n');
       else if (command.equals("loff")&& debugOverwriteMode){debugCommandLight=false;}
       else if (command.equals("won")&& debugOverwriteMode){debugCommandWater=true;}
       else if (command.equals("woff")&& debugOverwriteMode){debugCommandWater=false;}
+
+      /**/
+            else if (command.equals("Flower")){waterThreshold=600; waterPumpTime=4;lightThreshold=700;}
+            else if (command.equals("Fruit")){waterThreshold=650; waterPumpTime=6;lightThreshold=600;}
+            else if (command.equals("Legumes")){waterThreshold=700; waterPumpTime=5;lightThreshold=500;}
+             else if (command.equals("Potato")){waterThreshold=500; waterPumpTime=5;lightThreshold=650;}
+
+      /**/
+      
       else{
             Serial.println("Invalid command");
         }
