@@ -7,9 +7,11 @@
 
 //START DEBUG VAR
 bool useLog =false;//in relative section, set if(useLog && *log condition*) {  *logging the event* }
-bool testLight=true;//will bypass condition (if *light condition* || testLight) {light event}
+//bool testLight=true;//will bypass condition (if *light condition* || testLight) {light event}
 bool waterExtraDebug=true;//extra water info
-
+bool debugCommandLight=false;
+bool debugCommandWater=false;
+bool debugOverwriteMode=false;
 // START VARIABLES SECTION
 unsigned long militime;
  
@@ -49,8 +51,8 @@ void setup() {
   pinMode(OLight1, OUTPUT);
   pinMode(Pin2, INPUT);
   
-  digitalWrite(OWater1, HIGH);
-  digitalWrite(OLight1, HIGH);
+/*  digitalWrite(OWater1, HIGH);
+  digitalWrite(OLight1, HIGH);*/
 //Temp time setup we mentioned user input real time but its just for syncing purpose and not a service provided so it feels fine by me to just set time in code 
   setTime(0,8,30,1);//SetTime(day, hour, minute,Clockspeed_multiplier)
   Serial.println("\nThe time is: " + String(day()) + ":" + String(hour()) + ":" + String(minute()) + ":" + String(second()));
@@ -75,9 +77,10 @@ void loop() {
     userInputInLoopCheck();
     
     Serial.println("\nThe time is: " + String(day()) + ":" + String(hour()) + ":" + String(minute()) + ":" + String(second()));
+    if(!debugOverwriteMode){
     waterModule();
     lightModule(hour(),day(), minute());
-
+    }
     /*END WIP modules*/
 
 
@@ -130,6 +133,12 @@ void loop() {
 
     //
     displayWaterVariables(); 
+    /*DEBUG Command On Off */
+    if(debugCommandWater){  digitalWrite(OWater1, HIGH);}
+    else{digitalWrite(OWater1, LOW);}
+    if(debugCommandLight){  digitalWrite(OLight1, HIGH);
+}
+    else{digitalWrite(OLight1, LOW);}
     Serial.println("--------------------------------------------------------------");
 
 }//END of LOOP
@@ -242,7 +251,7 @@ void lightModule(int currentHour, int currentDay, int currentMinute){
   Serial.println();
   
   //assume daytime is in range of [7, 19]
-  if (currentHour >= 7 && currentHour < 19 && (light1 < lightThreshold || testLight) && light == 0){
+  if (currentHour >= 7 && currentHour < 19 && (light1 < lightThreshold) && light == 0){
       light_on(currentHour, currentDay, currentMinute);
   }
   /*else if (currentHour >= 7 && currentHour < 19 && light1 >= lightThreshold && light == 1){

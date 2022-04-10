@@ -1,5 +1,8 @@
 extern int waterThreshold;
 extern float lightThreshold;
+extern bool debugCommandLight;
+extern bool debugCommandWater;
+extern bool debugOverwriteMode;
 
 void userInputPrintGuide()
 {
@@ -56,6 +59,13 @@ String command = Serial.readStringUntil('\n');
   Serial.println(lightThreshold);
   Serial.println();        }
         //else if(command.equals("status")){   }//NoNeed Status as already showing status in main code(plantbuddy.ino)
+      else if (command.equals("overwrite")){debugOverwriteMode=!debugOverwriteMode;}
+ 
+ 
+      else if (command.equals("lon") && debugOverwriteMode){debugCommandLight=true;}
+      else if (command.equals("loff")&& debugOverwriteMode){debugCommandLight=false;}
+      else if (command.equals("won")&& debugOverwriteMode){debugCommandWater=true;}
+      else if (command.equals("woff")&& debugOverwriteMode){debugCommandWater=false;}
       else{
             Serial.println("Invalid command");
         }
