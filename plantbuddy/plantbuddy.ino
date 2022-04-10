@@ -40,7 +40,9 @@ int waterPumpTime = 5000; // How long to water the plant when in watering mode
 int waterReactTime = 10000;//delay : water takes time to inc moisture level
 int waterSchedule = 12; // Configurable by user, in hours for now
 int waterScheduleRange = 2; // Configurable by user, in hrs for now
-
+int frameCounter=0;
+int rawWater[5];
+int rawLight[5];
 // END VARIABLES SECTION
 
 void setup() {
@@ -71,19 +73,20 @@ writeLog(6,3,10,30,01);*/
 //readLog();
  }
 void loop() {
-    delay(1000);
+    delay(2000);
     /*BEGIN WIP modules*/
     userInputPrintGuide();
     userInputInLoopCheck();
     
     Serial.println("\nThe time is: " + String(day()) + ":" + String(hour()) + ":" + String(minute()) + ":" + String(second()));
+   
+    if(frameCounter>=5){frameCounter=0;}
     if(!debugOverwriteMode){
     waterModule();
     lightModule(hour(),day(), minute());
     }
     /*END WIP modules*/
-
-
+ frameCounter+=1;
     /*BEGIN original raw material from David  
 
     Serial.print("MOISTURE LEVEL: ");
@@ -116,10 +119,7 @@ void loop() {
 
     /*DEBUG:SHOW ALL VAR*/
     Serial.println("------------------- PRINTING ALL VARIABLES -------------------");
-    Serial.print("light threshold: ");
-    Serial.println(lightThreshold);
-    Serial.print("water threshold: ");
-    Serial.println(waterThreshold);
+
 
     // timer.h provides get functions e.g. day()   second()   hour()  minute()
     Serial.print("day ");
@@ -133,6 +133,8 @@ void loop() {
 
     //
     displayWaterVariables(); 
+    displayLightVariables();
+    
     /*DEBUG Command On Off */
     if(debugCommandWater){  digitalWrite(OWater1, HIGH);}
     else{digitalWrite(OWater1, LOW);}
@@ -159,8 +161,11 @@ void setupWaterModule() {
 
 //The main functionality for the water module. Called in the loop function in plantbuddy.ino
 void waterModule() {
-  //Water Sensing
-  water1 = analogRead(Pin1);
+  //Water Sensing and 5 value avg
+  rawWater[frameCounter] = analogRead(Pin1);
+  if(frameCounter==4)
+  {water1=(rawWater[0]+rawWater[1]+rawWater[2]+rawWater[3]+rawWater[4])/5; 
+  
   relativeWateredTime = (militime/(unsigned long)60000)-previousWateredTime;
   
   Serial.print("Moisture Level: ");
@@ -211,13 +216,15 @@ void waterModule() {
     Serial.println("  Water>maxWaterThreshold Please check the system, there is too much water in the environment.");
     // exit(0) and print error log
   }
-  
+  }// End of if framecounter==4  (can get avg from full array)
 }
 
 void displayWaterVariables() {
   Serial.println("OWater1: " + String(OWater1));
   Serial.println("Pin1: " + String(Pin1));
   Serial.println("water1: " + String(water1));
+  //Serial.println("waterRawReading:" + String(rawWater[0]));
+ // Serial.println(","+ String(rawWater[1])+","+  String(rawWater[2])+","+  String(rawWater[3])+","+  String(rawWater[4]));
   Serial.println("previousWateredTime: " + String(previousWateredTime));
   Serial.println("relativeWateredTime: " + String(relativeWateredTime));
   Serial.println("waterThreshold: " + String(waterThreshold));
@@ -245,10 +252,14 @@ void setupLightModule(){
 
 void lightModule(int currentHour, int currentDay, int currentMinute){
   //light sensoring
-  Serial.print("Light Level: ");
-  light1 = analogRead(Pin2);
-  Serial.println(light1);
-  Serial.println();
+   //light1 = analogRead(Pin2);
+
+rawLight[frameCounter] = analogRead(Pin2);
+  if(frameCounter==4)
+  {light1=(rawLight[0]+rawLight[1]+rawLight[2]+rawLight[3]+rawLight[4])/5;
+
+  /**/
+ 
   
   //assume daytime is in range of [7, 19]
   if (currentHour >= 7 && currentHour < 19 && (light1 < lightThreshold) && light == 0){
@@ -264,6 +275,7 @@ void lightModule(int currentHour, int currentDay, int currentMinute){
   else if (currentHour >= 19 && currentHour < 24 && light == 1){
       light_off(currentHour, currentDay, currentMinute);
   }
+  }//end of if fC==4 array filled
 }
 
 void light_on(int currentHour, int currentDay, int currentMinute){
@@ -291,5 +303,15 @@ void light_off(int currentHour, int currentDay, int currentMinute){
   Serial.print(currentMinute);
   Serial.println();
 }
+void displayLightVariables()
+{
+  Serial.print("light threshold: ");
+  Serial.println(lightThreshold);
+  Serial.println("light1: " + String(light1));
+  //Serial.println("lightRawReading:" + String(rawLight[0]));
+  //Serial.println(","+ String(rawLight[1])+","+  String(rawLight[2])+","+  String(rawLight[3])+","+  String(rawLight[4]));
+  Serial.print("light status: ");
+  Serial.println(String(light));
+  }
 
 //End light func def;
