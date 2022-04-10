@@ -12,6 +12,7 @@ bool waterExtraDebug=true;//extra water info
 bool debugCommandLight=false;
 bool debugCommandWater=false;
 bool debugOverwriteMode=false;
+int loopdelay=2;//seconds of loop sleep time
 // START VARIABLES SECTION
 unsigned long militime;
  
@@ -73,7 +74,7 @@ writeLog(6,3,10,30,01);*/
 //readLog();
  }
 void loop() {
-    delay(2000);
+    delay(loopdelay*1000);
     /*BEGIN WIP modules*/
     userInputPrintGuide();
     userInputInLoopCheck();

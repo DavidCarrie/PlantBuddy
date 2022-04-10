@@ -3,7 +3,7 @@ extern float lightThreshold;
 extern bool debugCommandLight;
 extern bool debugCommandWater;
 extern bool debugOverwriteMode;
-
+extern int loopdelay;
 void userInputPrintGuide()
 {
       Serial.println("\n\n-----------\nCommands guideline:");
@@ -19,8 +19,8 @@ void userInputPrintGuide()
   {
      if(Serial.available()){
 String command = Serial.readStringUntil('\n');
-        if(command.equals("set water")){
-            
+
+        if(command.equals("set water")){    
   Serial.println("Type a number in 5 seconds!");
   delay(5000);
   if(Serial.available()){
@@ -31,11 +31,35 @@ String command = Serial.readStringUntil('\n');
     Serial.println("Successful! You can give next command.");
     Serial.println();
   }
+  
   else{
     Serial.println("No input received. Please give a new command.");
     Serial.println();
   }
         }
+/**/
+        else if(command.equals("set delay")){    
+  Serial.println("Type a number in 5 seconds!");
+  delay(5000);
+  if(Serial.available()){
+     loopdelay = Serial.parseInt();
+     
+    Serial.print("The new loop sleep time: " );
+    Serial.println(loopdelay);
+    Serial.println("Successful! You can give next command.");
+    Serial.println();
+  }
+  
+  else{
+    Serial.println("No input received. Please give a new command.");
+    Serial.println();
+  }
+        }
+
+/**/
+
+
+        
         else if(command.equals("set light")){
   Serial.println("Type a number in 5 seconds!");
   delay(5000);
