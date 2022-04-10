@@ -227,15 +227,15 @@ void displayWaterVariables() {
   Serial.println("water1: " + String(water1));
   //Serial.println("waterRawReading:" + String(rawWater[0]));
  // Serial.println(","+ String(rawWater[1])+","+  String(rawWater[2])+","+  String(rawWater[3])+","+  String(rawWater[4]));
-  Serial.println("previousWateredTime: " + String(previousWateredTime));
-  Serial.println("relativeWateredTime: " + String(relativeWateredTime));
-  Serial.println("waterThreshold: " + String(waterThreshold));
-  Serial.println("waterThresholdRange: " + String(waterThresholdRange));
-  Serial.println("minWaterThreshold: " + String(minWaterThreshold));
-  Serial.println("maxWaterThreshold: " + String(maxWaterThreshold));
-  Serial.println("waterSchedule: " + String(waterSchedule));
-  Serial.println("waterScheduleRange: " + String(waterScheduleRange));
-  Serial.println("waterPumpTime: " + String(waterPumpTime));
+  Serial.println("prevWtime: " + String(previousWateredTime));
+  Serial.println("relWtime: " + String(relativeWateredTime));
+  Serial.println("wThresh: " + String(waterThreshold));
+  Serial.println("wThreshRange: " + String(waterThresholdRange));
+ // Serial.println("minWThresh: " + String(minWaterThreshold));
+  //Serial.println("maxWThresh: " + String(maxWaterThreshold));
+  Serial.println("wSched: " + String(waterSchedule));
+  Serial.println("wSchedRange: " + String(waterScheduleRange));
+  Serial.println("Pumptime: " + String(waterPumpTime));
 }
 
 
@@ -307,7 +307,7 @@ void light_off(int currentHour, int currentDay, int currentMinute){
 }
 void displayLightVariables()
 {
-  Serial.print("light threshold: ");
+  Serial.print("LThresh: ");
   Serial.println(lightThreshold);
   Serial.println("light1: " + String(light1));
   //Serial.println("lightRawReading:" + String(rawLight[0]));
