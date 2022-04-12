@@ -1,0 +1,24 @@
+ Commands
+
+set water 
+set light
+	(set the threshold e.g. 500)
+
+set delay
+
+	(set the loop delay sleep time in sec)
+
+overwrite  
+	(Overwrite mode enables command set ON/OFF Light/water)
+
+
+	lon// light on 	
+	loff  //light off
+	won// water pump on
+	woff// water pump off
+
+(presets (capital first letter)
+Flower
+Fruit
+Legumes
+Potato
